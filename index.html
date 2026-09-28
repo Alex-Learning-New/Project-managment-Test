@@ -1,69 +1,86 @@
 <!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>TaskFlow — Sign in</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="mobile.css" />
     <script type="module" src="js/supabase.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- ============ LOGIN SCREEN ============ -->
     <div id="login-screen">
-        <div class="login-brand">
-            <div class="brand-mark">
-                <div class="mark"><span></span></div>
-                TaskFlow
-            </div>
-            <div class="login-copy">
-                <h1>Plan. Track<br />Collaborate.</h1>
-                <p>
-                    Manage tasks, monitor progress, and keep your team aligned — all in
-                    one place.
-                </p>
-            </div>
-            <div></div>
+      <div class="login-brand">
+        <div class="brand-mark">
+          <div class="mark"><span></span></div>
+          TaskFlow
         </div>
-        <div class="login-form-wrap">
-            <form class="login-form" id="login-form" autocomplete="off">
-                <h2>Sign in</h2>
-                <p class="sub">Enter your ID and password to continue.</p>
-
-                <div class="field">
-                    <label for="login-id">Employee / Admin ID</label>
-                    <input id="login-id" type="text" placeholder="e.g. admin1 or emp3" required />
-                </div>
-                <div class="field">
-                    <label for="login-pass">Password</label>
-                    <input id="login-pass" type="password" placeholder="••••••••" required />
-                </div>
-                <p class="error-text" id="login-error"></p>
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px">
-                    Sign in →
-                </button>
-
-                <div class="demo-creds">
-                    <b>Demo credentials</b> — your ID decides your dashboard
-                    automatically.<br />
-                    Admin: <code>admin1</code> / <code>admin123</code><br />
-                    Employee: <code>emp1</code> / <code>emp123</code> (also emp2–emp5,
-                    same password)<br />
-                    Project Manager: <code>pm1</code> / <code>pm123</code>
-                </div>
-            </form>
+        <div class="login-copy">
+          <h1>Plan. Track<br />Collaborate.</h1>
+          <p>
+            Manage tasks, monitor progress, and keep your team aligned — all in
+            one place.
+          </p>
         </div>
+        <div></div>
+      </div>
+      <div class="login-form-wrap">
+        <form class="login-form" id="login-form" autocomplete="off">
+          <h2>Sign in</h2>
+          <p class="sub">Enter your ID and password to continue.</p>
+
+          <div class="field">
+            <label for="login-id">Employee / Admin ID</label>
+            <input
+              id="login-id"
+              type="text"
+              placeholder="e.g. admin1 or emp3"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="login-pass">Password</label>
+            <input
+              id="login-pass"
+              type="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <p class="error-text" id="login-error"></p>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="width: 100%; padding: 13px"
+          >
+            Sign in →
+          </button>
+
+          <div class="demo-creds">
+            <b>Demo credentials</b> — your ID decides your dashboard
+            automatically.<br />
+            Admin: <code>admin1</code> / <code>admin123</code><br />
+            Employee: <code>emp1</code> / <code>emp123</code> (also emp2–emp5,
+            same password)<br />
+            Project Manager: <code>pm1</code> / <code>pm123</code>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script type="module" src="js/data.js"></script>
     <script type="module" src="js/common.js"></script>
     <script type="module" src="js/login.js"></script>
-</body>
-
+  </body>
 </html>
