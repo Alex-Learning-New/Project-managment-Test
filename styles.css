@@ -282,9 +282,11 @@ a {
 .login-brand {
   flex: 1 1 46%;
   background:
-    radial-gradient(circle at 15% 12%,
+    radial-gradient(
+      circle at 15% 12%,
       rgba(255, 255, 255, 0.16),
-      transparent 45%),
+      transparent 45%
+    ),
     linear-gradient(155deg, var(--lime) 0%, #8fc400 60%, #6ea300 100%);
   color: var(--ink);
   padding: 56px 52px;
@@ -406,7 +408,7 @@ a {
   margin: 0 0 6px;
 }
 
-.login-form>p.sub {
+.login-form > p.sub {
   margin: 0 0 30px;
   color: var(--muted);
   font-size: 14.5px;
@@ -819,7 +821,7 @@ a {
   overflow: hidden;
 }
 
-.pbar>div {
+.pbar > div {
   height: 100%;
   background: var(--lime-dark);
   border-radius: 999px;
@@ -1079,7 +1081,7 @@ tr.clickable:hover {
   accent-color: var(--lime-dark);
 }
 
-.radio-choice input:checked+span {
+.radio-choice input:checked + span {
   color: var(--ink);
 }
 
@@ -1258,12 +1260,12 @@ tr.clickable:hover {
   padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .upload-zone:hover {
   border-color: var(--lime);
-  background: rgba(132, 204, 22, .05);
+  background: rgba(132, 204, 22, 0.05);
 }
 
 .file-list {
@@ -1517,7 +1519,7 @@ tr.clickable:hover {
 }
 
 .department-member {
-  background: rgba(255, 255, 255, .05);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--line);
   padding: 6px 10px;
   border-radius: 20px;
@@ -1525,7 +1527,6 @@ tr.clickable:hover {
 }
 
 #emp-team-content {
-
   .panel-body {
     padding: 10px 40px;
   }
@@ -1534,7 +1535,6 @@ tr.clickable:hover {
     background-color: transparent;
     border: none;
   }
-
 }
 
 #selected-team-area {
@@ -1546,8 +1546,7 @@ tr.clickable:hover {
 
 .team-grid {
   display: grid;
-  grid-template-columns:
-    repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
   background-color: transparent;
 }
@@ -1558,12 +1557,12 @@ tr.clickable:hover {
   border-radius: 14px;
   padding: 18px;
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .team-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, .08);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .team-members {
@@ -1616,12 +1615,12 @@ tr.clickable:hover {
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 #team-message:focus {
   border-color: var(--lime);
-  box-shadow: 0 0 0 3px rgba(180, 255, 0, .15);
+  box-shadow: 0 0 0 3px rgba(180, 255, 0, 0.15);
 }
 
 .team-message-actions {
@@ -1765,7 +1764,6 @@ Optimized for screens <= 768px.
 
 /* ---------- Grids & Panels ---------- */
 @media (max-width: 768px) {
-
   /* Stat grids */
   #admin-stat,
   #emp-mytasks-top,
@@ -1808,6 +1806,12 @@ Optimized for screens <= 768px.
   .panel-body {
     padding: 0;
     /* Remove padding so tables/rows can edge-to-edge if needed */
+  }
+
+  #emp-team-content {
+    .panel-body {
+      padding: 10px 20px;
+    }
   }
 }
 
@@ -1921,7 +1925,6 @@ Optimized for screens <= 768px.
 
 /* ---------- Forms & Inputs ---------- */
 @media (max-width: 768px) {
-
   /* Prevents iOS zoom on focus */
   .field input,
   .field select,
@@ -1981,7 +1984,6 @@ Optimized for screens <= 768px.
 
 /* ---------- Team & Department Grids ---------- */
 @media (max-width: 768px) {
-
   .team-grid,
   .department-grid {
     grid-template-columns: 1fr;
@@ -2057,7 +2059,6 @@ Optimized for screens <= 768px.
 
 /* ---------- Status Chart Layout ---------- */
 @media (max-width: 768px) {
-
   .status-chart-layout {
     display: flex;
     flex-direction: column;
@@ -2067,40 +2068,45 @@ Optimized for screens <= 768px.
     height: fit-content;
   }
 
-  #admin-stats , #pm-stats{
+  #admin-stats,
+  #pm-stats {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    align-items: stretch
+    align-items: stretch;
   }
 
-  #admin-stats .stat-card:nth-child(1) , #pm-stats .stat-card:nth-child(1) {
+  #admin-stats .stat-card:nth-child(1),
+  #pm-stats .stat-card:nth-child(1) {
     width: 100%;
     grid-row: 1;
     grid-column: 1;
     height: fit-content;
   }
 
-  #admin-stats .stat-card:nth-child(2) , #pm-stats .stat-card:nth-child(2){
+  #admin-stats .stat-card:nth-child(2),
+  #pm-stats .stat-card:nth-child(2) {
     width: 100%;
     grid-row: 1;
     grid-column: 2;
     height: 100%;
   }
 
-  #admin-stats .stat-card:nth-child(3) , #pm-stats .stat-card:nth-child(3){
+  #admin-stats .stat-card:nth-child(3),
+  #pm-stats .stat-card:nth-child(3) {
     width: 100%;
     grid-row: 2;
     grid-column: 1;
-    height: fit-content;  
+    height: fit-content;
   }
 
-  #admin-stats .stat-card:nth-child(4) , #pm-stats .stat-card:nth-child(4){
+  #admin-stats .stat-card:nth-child(4),
+  #pm-stats .stat-card:nth-child(4) {
     width: 100%;
     grid-row: 2;
     grid-column: 2;
-    height: 100%; 
+    height: 100%;
   }
 
   .chart-wrap {
@@ -2109,16 +2115,16 @@ Optimized for screens <= 768px.
     margin: 0 auto;
   }
 
-  .highcharts-root{
+  .highcharts-root {
     height: fit-content;
   }
 
-  .highcharts-1b0hqkm-0{
+  .highcharts-1b0hqkm-0 {
     height: fit-content;
     width: fit-content;
   }
 
-  #emp-stats{
+  #emp-stats {
     width: 100%;
   }
 
@@ -2126,15 +2132,13 @@ Optimized for screens <= 768px.
     height: fit-content;
   }
 
-  #emp-task-list{
+  #emp-task-list {
     height: fit-content;
   }
-
 }
 
 /* ---------- Touch Device Optimizations ---------- */
 @media (hover: none) and (pointer: coarse) {
-
   /* Remove hover effects on touch devices to prevent sticky hovers */
   .task-row:hover,
   tr.clickable:hover,
@@ -2160,24 +2164,31 @@ Optimized for screens <= 768px.
 }
 
 @media (max-width: 768px) {
-  #employee-search, #department-filter, #assignment-filter, #ws-search, #ws-date-filter, #ws-status-filter, #pm-employee-search, #pm-department-filter{
+  #employee-search,
+  #department-filter,
+  #assignment-filter,
+  #ws-search,
+  #ws-date-filter,
+  #ws-status-filter,
+  #pm-employee-search,
+  #pm-department-filter {
     padding-left: 20px;
     padding-right: 20px;
   }
-  .stat-card{
-    width:100%;
+  .stat-card {
+    width: 100%;
   }
-  #ws-admin-stats{
+  #ws-admin-stats {
     grid-template-columns: 1fr 1fr;
   }
-  .stat-card:nth-child(3){
-    width:100%;
+  .stat-card:nth-child(3) {
+    width: 100%;
     grid-column: span 2;
   }
-  .task-row.status-todo{
+  .task-row.status-todo {
     height: 150px;
   }
-  #admin-attention-list{
+  #admin-attention-list {
     padding: 5px 10px;
     /* height: 100%; */
   }
