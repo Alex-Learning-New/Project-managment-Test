@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>TaskFlow — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="worksheet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script type="module" src="js/supabase.js"></script>
+</head>
+
+<body>
+    <!-- ============ APP SHELL ============ -->
+    <div class="sidebar-scrim" id="sidebar-scrim"></div>
+    <div id="app-shell" class="active">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand-mark">
+                <div class="mark"><span></span></div>
+                TaskFlow
+            </div>
+
+            <!-- ADMIN NAV -->
+            <div id="admin-nav">
+                <div class="nav-group">
+                    <div class="nav-label">Workspace</div>
+                    <button class="nav-item" data-view="admin-overview">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+                        </svg>
+                        Overview
+                    </button>
+                    <button class="nav-item" data-view="admin-tasks">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 11l3 3 8-8" />
+                            <path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        All Tasks <span class="count" id="nav-count-tasks">0</span>
+                    </button>
+                    <button class="nav-item" data-view="admin-teams">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        Teams <span class="count" id="nav-count-teams">0</span>
+                    </button>
+                    <button class="nav-item" data-view="admin-people">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
+                        </svg>
+                        Employees
+                    </button>
+                    <button class="nav-item" data-view="admin-departments">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 3h18v6H3z" />
+                            <path d="M3 15h8v6H3z" />
+                            <path d="M13 15h8v6h-8z" />
+                        </svg>
+                        Departments
+                    </button>
+                    <button class="nav-item" data-view="admin-worksheets">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M9 13h6M9 17h6" />
+              </svg>
+                        Worksheets
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-foot">
+                <div class="avatar" id="sidebar-avatar" style="background: var(--lime)">--</div>
+                <div class="who">
+                    <b id="sidebar-name">—</b>
+                    <span id="sidebar-role">—</span>
+                </div>
+                <button class="icon-btn" id="logout-btn" title="Sign out">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <div class="main">
+            <div class="topbar">
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <button class="icon-btn hidden" id="menu-btn" style="color: var(--ink)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 6h18M3 12h18M3 18h18" />
+                        </svg>
+                    </button>
+                    <div>
+                        <h1 id="topbar-title">Overview</h1>
+                        <div class="sub" id="topbar-sub">Welcome back</div>
+                    </div>
+                </div>
+                <div class="topbar-actions" id="topbar-actions"></div>
+            </div>
+
+            <!-- ===== OVERVIEW ===== -->
+            <div class="view" id="view-admin-overview">
+                <div id="admin-stat">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <h3>Project Status Overview</h3>
+                        </div>
+                        <div class="status-chart-layout">
+                            <div class="status-list" id="admin-stats">
+                                <!-- status cards generated here -->
+                            </div>
+                            <div class="chart-wrap">
+                                <div id="adminStatusChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-head">
+                            <h3>Needs attention</h3>
+                            <span class="hint">Overdue or update requested</span>
+                        </div>
+                        <div class="panel-body" id="admin-attention-list"></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Recent activity</h3>
+                    </div>
+                    <div class="panel-body" id="admin-activity-list" style="padding: 14px 20px"></div>
+                </div>
+            </div>
+
+            <!-- ===== ALL TASKS ===== -->
+            <div class="view hidden" id="view-admin-tasks">
+                <div class="view-head">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap" id="task-filter-bar"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body" id="admin-task-list"></div>
+                </div>
+            </div>
+
+            <!-- ===== TEAMS ===== -->
+            <div class="view hidden" id="view-admin-teams">
+                <div class="team-grid" id="admin-team-grid"></div>
+            </div>
+
+            <!-- ===== EMPLOYEES ===== -->
+            <div class="view hidden" id="view-admin-people">
+                <div class="panel">
+                    <div class="panel-body" style="padding: 0">
+                        <div class="scrollx">
+                            <div class="employee-filters">
+                                <input type="text" id="employee-search" placeholder="Search employee or department" />
+                                <select id="department-filter">
+                                    <option value="all">All Departments</option>
+                                </select>
+                                <select id="assignment-filter">
+                                    <option value="all">All Employees</option>
+                                    <option value="assigned">Assigned Work</option>
+                                    <option value="unassigned">No Work Assigned</option>
+                                </select>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Department</th>
+                                        <th>Team</th>
+                                        <th>Open tasks</th>
+                                        <th>Completed</th>
+                                        <th>Avg. progress</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-people-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== WORKSHEETS ===== -->
+            <div class="view hidden" id="view-admin-worksheets">
+                <div class="ws-stat-row" id="ws-admin-stats"></div>
+                <div class="panel">
+                    <div class="panel-body" style="padding: 0">
+                        <div class="scrollx">
+                            <div class="employee-filters">
+                                <input type="text" id="ws-search" placeholder="Search employee, project or work" />
+                                <input type="date" id="ws-date-filter" title="Filter by date" style="flex: none; min-width: 170px" />
+                                <select id="ws-status-filter">
+                                    <option value="all">All statuses</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="in-progress">In progress</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Employee</th>
+                                        <th>Project</th>
+                                        <th>Work</th>
+                                        <th>Time</th>
+                                        <th>Hours</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ws-admin-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DEPARTMENTS ===== -->
+            <div class="view hidden" id="view-admin-departments">
+                <div id="department-grid" class="department-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODALS ============ -->
+
+    <!-- Create task modal -->
+    <div class="modal-backdrop hidden" id="modal-create-task">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>New task</h3>
+                <button class="modal-close" data-close>✕</button>
+            </div>
+            <form id="form-create-task">
+                <div class="modal-body">
+                    <div class="field">
+                        <label>Task title</label><input type="text" id="ct-title" required
+                            placeholder="e.g. Redesign onboarding flow" />
+                    </div>
+                    <div class="field">
+                        <label>Description</label><textarea id="ct-desc" placeholder="What needs to happen?"></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Attachments (Optional)</label>
+                        <div class="upload-zone" id="ct-upload-zone">
+                            <input type="file" id="ct-file-input" multiple class="hidden">
+                            Click to attach files
+                        </div>
+                        <div id="ct-file-list" class="file-list"></div>
+                    </div>
+                    <div id="ct-assignee-pm-wrap" class="field">
+                        <label>Project Manager</label>
+                        <select id="ct-assignee-pm"></select>
+                    </div>
+                    <div class="field">
+                        <label>Assign to</label>
+                        <div class="radio-choice">
+                            <label><input type="radio" name="ct-assign-type" value="employee" checked /><span>An
+                                    employee</span></label>
+                            <label><input type="radio" name="ct-assign-type" value="team" /><span>A whole
+                                    team</span></label>
+                        </div>
+                    </div>
+                    <div class="field" id="ct-assignee-employee-wrap">
+                        <label>Employee</label>
+                        <select id="ct-assignee-employee"></select>
+                    </div>
+                    <div class="field hidden" id="ct-assignee-team-wrap">
+                        <label>Team</label>
+                        <select id="ct-assignee-team"></select>
+                    </div>
+                    <div id="assignment-preview" class="panel" style="margin-top: 12px"></div>
+
+                    <div class="row-2">
+                        <div class="field">
+                            <label>Priority</label>
+                            <select id="ct-priority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Due date</label><input type="date" id="ct-due" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-lime">Create task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create team modal -->
+    <div class="modal-backdrop hidden" id="modal-create-team">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>New team</h3>
+                <button class="modal-close" data-close>✕</button>
+            </div>
+            <form id="form-create-team">
+                <div class="modal-body">
+                    <div class="field">
+                        <label>Team name</label><input type="text" id="cteam-name" required placeholder="Team name" />
+                    </div>
+                    <div class="field">
+                        <label>Members</label>
+                        <div class="form-group">
+                            <div id="selected-members-bar" class="selected-members-bar"></div>
+                            <input type="text" id="cteam-search" class="input"
+                                placeholder="Search by name or department" style="width: 100%" />
+                        </div>
+
+                        <div class="checkbox-list" id="cteam-members"></div>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-lime">Create team</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit team modal -->
+    <div class="modal-backdrop hidden" id="modal-edit-team">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>Edit Team Members</h3>
+                <button class="modal-close" data-close>✕</button>
+            </div>
+
+            <form id="form-edit-team">
+                <div class="modal-body">
+                    <div class="field">
+                        <label>Team Name</label>
+                        <input type="text" id="edit-team-name" />
+                    </div>
+
+                    <div class="field">
+                        <label>Members</label>
+                        <div class="checkbox-list" id="edit-team-members"></div>
+                    </div>
+                </div>
+
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-lime">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task detail modal -->
+    <div class="modal-backdrop hidden" id="modal-task-detail">
+        <div class="modal" style="max-width: 600px">
+            <div class="modal-head">
+                <h3 id="td-title">Task</h3>
+                <button class="modal-close" data-close>✕</button>
+            </div>
+            <div class="modal-body" id="td-body"></div>
+            <div class="modal-foot" id="td-foot"></div>
+        </div>
+    </div>
+
+    <!-- Worksheet detail modal -->
+    <div class="modal-backdrop hidden" id="modal-worksheet-detail">
+        <div class="modal" style="max-width: 640px">
+            <div class="modal-head">
+                <h3 id="ws-detail-title">Worksheet</h3>
+                <button class="modal-close" data-close>✕</button>
+            </div>
+            <div class="modal-body" id="ws-detail-body"></div>
+        </div>
+    </div>
+
+    <div class="toast-wrap" id="toast-wrap"></div>
+
+    <script type="module" src="js/data.js"></script>
+    <script type="module" src="js/common.js"></script>
+    <script type="module" src="js/admin.js"></script>
+</body>
+
+</html>

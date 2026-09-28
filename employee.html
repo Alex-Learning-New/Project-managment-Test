@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>TaskFlow — My Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="worksheet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script type="module" src="js/supabase.js"></script>
+  </head>
+
+  <body>
+    <!-- ============ APP SHELL ============ -->
+    <div class="sidebar-scrim" id="sidebar-scrim"></div>
+    <div id="app-shell" class="active">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand-mark">
+          <div class="mark"><span></span></div>
+          TaskFlow
+        </div>
+
+        <!-- EMPLOYEE NAV -->
+        <div id="employee-nav">
+          <div class="nav-group">
+            <div class="nav-label">Workspace</div>
+            <button class="nav-item" data-view="emp-mytasks">
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 11l3 3 8-8" />
+                <path
+                  d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"
+                />
+              </svg>
+              My Tasks <span class="count" id="nav-count-mytasks">0</span>
+            </button>
+            <button class="nav-item" data-view="emp-worksheet">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M9 13h6M9 17h6" />
+              </svg>
+              Daily Worksheet
+            </button>
+            <button class="nav-item" data-view="emp-team">
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              My Team <span class="count" id="nav-count-myteam">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-foot">
+          <div
+            class="avatar"
+            id="sidebar-avatar"
+            style="background: var(--lime)"
+          >
+            --
+          </div>
+          <div class="who">
+            <b id="sidebar-name">—</b>
+            <span id="sidebar-role">—</span>
+          </div>
+          <button class="icon-btn" id="logout-btn" title="Sign out">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button
+              class="icon-btn hidden"
+              id="menu-btn"
+              style="color: var(--ink)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 6h18M3 12h18M3 18h18" />
+              </svg>
+            </button>
+            <div>
+              <h1 id="topbar-title">My tasks</h1>
+              <div class="sub" id="topbar-sub">Welcome back</div>
+            </div>
+          </div>
+          <div class="topbar-actions" id="topbar-actions"></div>
+        </div>  
+
+        <!-- ===== MY TASKS ===== -->
+        <div class="view hidden" id="view-emp-mytasks">
+          <div id="emp-mytasks-top">    
+            <div class="panel">
+              <div class="panel-head">
+                <h3>My Task Status</h3>
+              </div>
+              <div class="status-chart-layout">
+                <div class="status-list" id="emp-stats">
+                  <!-- status cards generated here -->
+                </div>
+
+                <div class="chart-wrap">
+                  <div id="empStatusChart"></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h3>My Tasks</h3>
+              </div>
+              <div class="panel-body" id="emp-task-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== DAILY WORKSHEET ===== -->
+        <div class="view hidden" id="view-emp-worksheet">
+          <div id="emp-worksheet-content"></div>
+        </div>
+
+        <!-- ===== MY TEAM ===== -->
+        <div class="view hidden" id="view-emp-team">
+          <div id="emp-team-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODALS ============ -->
+
+    <!-- Task detail modal -->
+    <div class="modal-backdrop hidden" id="modal-task-detail">
+      <div class="modal" style="max-width: 600px">
+        <div class="modal-head">
+          <h3 id="td-title">Task</h3>
+          <button class="modal-close" data-close>✕</button>
+        </div>
+        <div class="modal-body" id="td-body"></div>
+        <div class="modal-foot" id="td-foot"></div>
+      </div>
+    </div>
+
+    <div class="toast-wrap" id="toast-wrap"></div>
+
+  <script type="module" src="js/data.js"></script>
+  <script type="module" src="js/common.js"></script>
+  <script type="module" src="js/employee.js"></script>
+  </body>
+</html>

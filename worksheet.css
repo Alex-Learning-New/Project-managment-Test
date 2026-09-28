@@ -1,0 +1,258 @@
+/* ============================================================
+   worksheet.css — Daily Worksheet (employee) + Worksheets (admin)
+   Uses the design tokens from styles.css; load it after styles.css.
+   ============================================================ */
+
+/* ---------- employee form ---------- */
+.ws-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ws-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.ws-header h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+}
+
+.ws-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+}
+
+.ws-today {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 22px;
+  text-align: right;
+}
+
+.ws-today span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.ws-today b {
+  font-size: 14.5px;
+}
+
+.ws-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 26px 28px 12px;
+  margin-bottom: 20px;
+}
+
+.ws-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ws-card-head h3 {
+  margin: 0 0 3px;
+  font-size: 17px;
+}
+
+.ws-card-head p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.ws-num {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--lime-pale);
+  color: var(--lime-dark);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ws-card .field input,
+.ws-card .field select,
+.ws-card .field textarea {
+  border-radius: 12px;
+  padding: 15px 16px;
+  font-size: 14.5px;
+}
+
+.ws-card .field textarea {
+  min-height: 120px;
+}
+
+.ws-card .field input.ws-readonly {
+  background: #f3f8e6;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* drop zone */
+.ws-dropzone {
+  border: 2px dashed var(--lime);
+  border-radius: 16px;
+  background: #fbfff0;
+  padding: 34px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-dropzone:hover,
+.ws-dropzone.drag {
+  background: var(--lime-pale);
+  border-color: var(--lime-dark);
+}
+
+.ws-drop-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--lime-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.ws-dropzone b {
+  font-size: 15px;
+}
+
+.ws-dropzone span {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.ws-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.ws-file-list:empty {
+  display: none;
+}
+
+.ws-file-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+}
+
+.ws-file-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ws-file-size {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ws-file-remove {
+  border: none;
+  background: none;
+  color: var(--coral);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.ws-file-remove:hover {
+  background: var(--coral-bg);
+}
+
+.ws-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.ws-actions .btn {
+  padding: 13px 24px;
+}
+
+@media (max-width: 880px) {
+  .ws-card {
+    padding: 20px 18px 6px;
+  }
+  .ws-today {
+    text-align: left;
+  }
+}
+
+/* ---------- admin view ---------- */
+.ws-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.ws-detail-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+}
+
+.file-item a.fname {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.file-item a.fname:hover {
+  text-decoration: underline;
+}
+
+/* task-progress slider inside the worksheet form */
+.ws-card .field input[type="range"] {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 999px;
+  background: transparent;
+} 
