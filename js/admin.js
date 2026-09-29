@@ -27,8 +27,8 @@ const ADMIN_VIEW_TITLES = {
         "Track everything happening across your workspace",
     ],
     "admin-tasks": [
-        "All tasks",
-        "Every task you\u2019ve assigned, across every employee and team",
+        "All projects",
+        "Every project you\u2019ve assigned, across every employee and team",
     ],
     "admin-teams": [
         "Teams",
@@ -67,8 +67,8 @@ function renderAdminOverview() {
     const overdue = tasks.filter(isOverdue).length;
 
     document.getElementById("admin-stats").innerHTML = `
-    ${statCard("Total tasks", total, `${state.teams.length} teams · ${state.users.filter((u) => u.role === "employee").length} employees`)}
-    ${statCard("In progress", inProgress, `${Math.round((inProgress / total) * 100) || 0}% of all tasks`)}
+    ${statCard("Total projects", total, `${state.teams.length} teams · ${state.users.filter((u) => u.role === "employee").length} employees`)}
+    ${statCard("In progress", inProgress, `${Math.round((inProgress / total) * 100) || 0}% of all projects`)}
     ${statCard("Completed", done, `${Math.round((done / total) * 100) || 0}% completion rate`)}
     ${statCard("Overdue", overdue, overdue > 0 ? "Needs attention" : "All on track", overdue > 0)}
     `;
@@ -119,7 +119,7 @@ function renderAdminTasks() {
     );
     document.getElementById("admin-task-list").innerHTML = list.length
         ? list.map(taskRowHtml).join("")
-        : `<div class="empty-row">No tasks match this filter.</div>`;
+        : `<div class="empty-row">No projects match this filter.</div>`;
     attachTaskRowHandlers("admin-task-list", openTaskDetail);
 }
 
@@ -141,7 +141,7 @@ function renderAdminTeams() {
                     <div class="tcount">
                         ${members.length} member${members.length !== 1 ? "s" : ""}
                         ·
-                        ${teamTasks.length} team task${teamTasks.length !== 1 ? "s" : ""}
+                        ${teamTasks.length} team project${teamTasks.length !== 1 ? "s" : ""}
                     </div>
 
                     <div class="team-members">
@@ -451,7 +451,7 @@ function renderAdminPeople() {
         <td>${open}</td>
         <td>${done}</td>
         <td style="width:140px;"><div class="pbar"><div style="width:${avg}%"></div></div><div class="progress-num">${avg}%</div></td>
-        <td><button class="btn btn-sm ${open === 0 ? "btn-disabled" : "btn-ghost"}" data-askupdate="${u.id}" ${open === 0 ? "disabled" : ""}> ${open === 0 ? "No Active Tasks" : "Ask for Update"}</button></td></tr>`;
+        <td><button class="btn btn-sm ${open === 0 ? "btn-disabled" : "btn-ghost"}" data-askupdate="${u.id}" ${open === 0 ? "disabled" : ""}> ${open === 0 ? "No Active Projects" : "Ask for Update"}</button></td></tr>`;
         })
         .join("");
 
@@ -463,7 +463,7 @@ function renderAdminPeople() {
                 const uid = btn.dataset.askupdate;
                 const myTasks = tasksFor(uid).filter((t) => t.status !== "done");
                 if (!myTasks.length) {
-                    toast("No open tasks to request an update on.");
+                    toast("No open projects to request an update on.");
                     return;
                 }
                 const ids = myTasks.map(t => t.id);
@@ -529,7 +529,7 @@ function openTaskDetail(taskId) {
 
     const foot = document.getElementById("td-foot");
     foot.innerHTML = `
-    <button class="btn btn-danger" id="td-delete-task">Delete Task</button>
+    <button class="btn btn-danger" id="td-delete-task">Delete Project</button>
 
     <button class="btn ${t.updateRequested ? "btn-ghost" : "btn-danger"}"
         id="td-ask-update"
@@ -560,7 +560,7 @@ function openTaskDetail(taskId) {
 
     document.getElementById("td-delete-task").addEventListener("click", async () => {
         const confirmed = confirm(
-            `Delete task "${t.title}"?\n\nThis action cannot be undone.`,
+            `Delete project "${t.title}"?\n\nThis action cannot be undone.`,
         );
         if (!confirmed) return;
 
@@ -581,7 +581,7 @@ function openTaskDetail(taskId) {
 
         closeModal("modal-task-detail");
         rerenderCurrent();
-        toast("Task deleted.", "error");
+        toast("Project deleted.", "error");
     });
 
     document
@@ -764,7 +764,7 @@ function renderAssignmentPreview() {
                 <div style="color:var(--coral)"><b>${summary.overdue}</b><div class="hint">Overdue</div></div>
             </div>
 
-            <div><strong>Active Tasks (${summary.total})</strong></div>
+            <div><strong>Active Projects (${summary.total})</strong></div>
 
             <div style="margin-top:10px;">
                 ${summary.tasks.length
@@ -779,12 +779,12 @@ function renderAssignmentPreview() {
                     `,
                 )
                 .join("")
-            : '<div class="hint">No tasks assigned.</div>'
+            : '<div class="hint">No projects assigned.</div>'
         }
             </div>
 
             ${summary.tasks.length > 5
-            ? `<div class="hint" style="margin-top:8px;">+${summary.tasks.length - 5} more tasks</div>`
+            ? `<div class="hint" style="margin-top:8px;">+${summary.tasks.length - 5} more projects</div>`
             : ""
         }
         </div>
@@ -889,7 +889,7 @@ document
         renderTaskFileList();
         document.getElementById("form-create-task").reset();
 
-        toast("Task created successfully.", "success");
+        toast("Project created successfully.", "success");
         closeModal("modal-create-task");
         rerenderCurrent();
     });
@@ -903,8 +903,8 @@ initShell({
     defaultView: "admin-overview",
     titles: ADMIN_VIEW_TITLES,
     topbarActions: {
-        "admin-overview": { label: "+ New task", onClick: openCreateTask },
-        "admin-tasks": { label: "+ New task", onClick: openCreateTask },
+        "admin-overview": { label: "+ New project", onClick: openCreateTask },
+        "admin-tasks": { label: "+ New project", onClick: openCreateTask },
         "admin-teams": { label: "+ New team", onClick: openCreateTeam },
     },
     render: renderAdminView,

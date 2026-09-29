@@ -31,7 +31,7 @@ const PM_VIEW_TITLES = {
     ],
     "pm-tasks": [
         "My projects",
-        "Every task assigned under your projects",
+        "Every project you manage",
     ],
     "pm-teams": [
         "Teams",
@@ -86,8 +86,8 @@ function renderPMOverview() {
     const overdue = tasks.filter(isOverdue).length;
 
     document.getElementById("pm-stats").innerHTML = `
-    ${statCard("Total tasks", total, `${teamsInTasks(tasks).length} teams · ${employeesInTasks(tasks).length} people`)}
-    ${statCard("In progress", inProgress, `${Math.round((inProgress / total) * 100) || 0}% of your tasks`)}
+    ${statCard("Total projects", total, `${teamsInTasks(tasks).length} teams · ${employeesInTasks(tasks).length} people`)}
+    ${statCard("In progress", inProgress, `${Math.round((inProgress / total) * 100) || 0}% of your projects`)}
     ${statCard("Completed", done, `${Math.round((done / total) * 100) || 0}% completion rate`)}
     ${statCard("Overdue", overdue, overdue > 0 ? "Needs attention" : "All on track", overdue > 0)}
     `;
@@ -140,7 +140,7 @@ function renderPMTasks() {
     );
     document.getElementById("pm-task-list").innerHTML = list.length
         ? list.map(taskRowHtml).join("")
-        : `<div class="empty-row">No tasks match this filter.</div>`;
+        : `<div class="empty-row">No projects match this filter.</div>`;
     attachTaskRowHandlers("pm-task-list", openTaskDetail);
 }
 
@@ -240,7 +240,7 @@ function renderPMPeople() {
         <td>${open}</td>
         <td>${done}</td>
         <td style="width:140px;"><div class="pbar"><div style="width:${avg}%"></div></div><div class="progress-num">${avg}%</div></td>
-        <td><button class="btn btn-sm ${open === 0 ? "btn-disabled" : "btn-ghost"}" data-askupdate="${u.id}" ${open === 0 ? "disabled" : ""}> ${open === 0 ? "No Active Tasks" : "Ask for Update"}</button></td></tr>`;
+        <td><button class="btn btn-sm ${open === 0 ? "btn-disabled" : "btn-ghost"}" data-askupdate="${u.id}" ${open === 0 ? "disabled" : ""}> ${open === 0 ? "No Active Projects" : "Ask for Update"}</button></td></tr>`;
         })
         .join("") || `<tr><td colspan="7"><div class="empty-row">No one is working on your projects yet.</div></td></tr>`;
 
@@ -253,7 +253,7 @@ function renderPMPeople() {
                 const user = getUser(uid);
                 const openTasks = tasksUnderMe(user).filter((t) => t.status !== "done");
                 if (!openTasks.length) {
-                    toast("No open tasks to request an update on.");
+                    toast("No open projects to request an update on.");
                     return;
                 }
                 const ids = openTasks.map((t) => t.id);
@@ -284,7 +284,7 @@ function openTaskDetail(taskId) {
 
     const foot = document.getElementById("td-foot");
     foot.innerHTML = `
-    <button class="btn btn-danger" id="td-delete-task">Delete Task</button>
+    <button class="btn btn-danger" id="td-delete-task">Delete Project</button>
 
     <button class="btn ${t.updateRequested ? "btn-ghost" : "btn-danger"}"
         id="td-ask-update"
@@ -307,7 +307,7 @@ function openTaskDetail(taskId) {
 
     document.getElementById("td-delete-task").addEventListener("click", async () => {
         const confirmed = confirm(
-            `Delete task "${t.title}"?\n\nThis action cannot be undone.`,
+            `Delete project "${t.title}"?\n\nThis action cannot be undone.`,
         );
         if (!confirmed) return;
 
@@ -330,7 +330,7 @@ function openTaskDetail(taskId) {
 
         closeModal("modal-task-detail");
         rerenderCurrent();
-        toast("Task deleted.", "error");
+        toast("Project deleted.", "error");
     });
 
     document.getElementById("td-ask-update").addEventListener("click", async () => {
@@ -518,7 +518,7 @@ function renderAssignmentPreview() {
                 <div style="color:var(--coral)"><b>${summary.overdue}</b><div class="hint">Overdue</div></div>
             </div>
 
-            <div><strong>Active Tasks (${summary.total})</strong></div>
+            <div><strong>Active Projects (${summary.total})</strong></div>
 
             <div style="margin-top:10px;">
                 ${summary.tasks.length
@@ -533,12 +533,12 @@ function renderAssignmentPreview() {
                     `,
                 )
                 .join("")
-            : '<div class="hint">No tasks assigned.</div>'
+            : '<div class="hint">No projects assigned.</div>'
         }
             </div>
 
             ${summary.tasks.length > 5
-            ? `<div class="hint" style="margin-top:8px;">+${summary.tasks.length - 5} more tasks</div>`
+            ? `<div class="hint" style="margin-top:8px;">+${summary.tasks.length - 5} more projects</div>`
             : ""
         }
         </div>
@@ -639,7 +639,7 @@ document
         renderTaskFileList();
         document.getElementById("form-create-task").reset();
 
-        toast("Task created successfully.", "success");
+        toast("Project created successfully.", "success");
         closeModal("modal-create-task");
         rerenderCurrent();
     });
@@ -653,8 +653,8 @@ initShell({
     defaultView: "pm-overview",
     titles: PM_VIEW_TITLES,
     topbarActions: {
-        "pm-overview": { label: "+ New task", onClick: openCreateTask },
-        "pm-tasks": { label: "+ New task", onClick: openCreateTask },
+        "pm-overview": { label: "+ New project", onClick: openCreateTask },
+        "pm-tasks": { label: "+ New project", onClick: openCreateTask },
     },
     render: renderPMView,
     updateNavCounts: updatePMNavCounts,

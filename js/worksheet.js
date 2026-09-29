@@ -4,6 +4,7 @@ import { supabase } from "./supabase.js";
 import { currentUser, tasksFor, toast, escapeHtml } from "./common.js";
 import { loadData } from "./data.js";
 import { uploadFiles, MAX_FILE_MB } from "./storage.js";
+import { emailProjectManager } from "./notify.js";
 
 /* ============================================================
    worksheet.js — the employee "Daily Worksheet" tab
@@ -104,7 +105,7 @@ function formHtml() {
           </div>
         </div>
         <div class="field">
-          <label for="ws-title">Work / Task</label>
+          <label for="ws-title">Work Title</label>
           <input type="text" id="ws-title" placeholder="Example: Completed motor testing" />
         </div>
         <div class="field">
@@ -146,7 +147,7 @@ function formHtml() {
           </div>
         </div>
         <div class="field hidden" id="ws-progress-wrap">
-          <label for="ws-progress">Task Progress</label>
+          <label for="ws-progress">Project Progress</label>
           <div class="slider-row">
             <input type="range" min="0" max="100" step="5" id="ws-progress" value="0" />
             <div class="pct" id="ws-progress-pct">0%</div>
@@ -283,7 +284,7 @@ async function submitWorksheet() {
 
     if (!workDate) return (errEl.textContent = "Please choose a date.");
     if (!projectVal) return (errEl.textContent = "Please select a project.");
-    if (!workTitle) return (errEl.textContent = "Please enter the work / task.");
+    if (!workTitle) return (errEl.textContent = "Please enter a work title.");
     if (!description) return (errEl.textContent = "Please describe the work you did.");
     if (!start || !end) return (errEl.textContent = "Please enter your start and end time.");
 
@@ -301,14 +302,9 @@ async function submitWorksheet() {
     try {
         const files = await uploadFiles(pendingFiles, `worksheets/${u.id}`);
 
-        uploaded.forEach(file => {
+        files.forEach((file) => {
             file.uploadedAt = new Date().toISOString();
-
-            file.uploadedBy = {
-                id: user.id,
-                name: user.name,
-                role: user.role
-            };
+            file.uploadedBy = { id: u.id, name: u.name, role: u.role };
         });
 
         const { error } = await supabase.from("worksheets").insert({
@@ -354,16 +350,27 @@ async function submitWorksheet() {
                 })
                 .eq("id", task.id);
             if (taskErr) taskWarning = taskErr.message;
+            else if (progress !== (task.progress ?? 0)) {
+                /* tell the project manager (runs in the background) */
+                emailProjectManager(task, {
+                    employeeId: u.id,
+                    oldProgress: task.progress ?? 0,
+                    newProgress: progress,
+                    note: `${workTitle} — ${description}`,
+                    source: "daily worksheet",
+                    work: { start, end, minutes: mins },
+                });
+            }
         }
 
         await loadData();
 
         if (taskWarning) {
-            toast(`Worksheet saved, but the task progress wasn't updated: ${taskWarning}`, "error");
+            toast(`Worksheet saved, but the project progress wasn't updated: ${taskWarning}`, "error");
         } else {
             toast(
                 task
-                    ? "Worksheet submitted and task progress updated."
+                    ? "Worksheet submitted and project progress updated."
                     : "Worksheet submitted — your admin can now view it.",
                 "success",
             );

@@ -14,13 +14,13 @@ const SESSION_KEY = "taskflow_session_v1";
 
 /* ================= AVATARS & FORMATTING ================= */
 const AVATAR_COLORS = [
-    "#A6E000",
-    "#8FD9C4",
-    "#F3C969",
-    "#F2A6A6",
-    "#B9AEF0",
-    "#8FC4E8",
-    "#F0C6E0",
+    "#8EC5FF",
+    "#8FE0B0",
+    "#FFD48A",
+    "#FF9FA8",
+    "#C4B5FD",
+    "#9FE0F5",
+    "#FFB5D8",
 ];
 
 export function colorFor(id) {
@@ -382,7 +382,7 @@ export function recentActivityHtml(tasks, activityLog = []) {
         html: `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
         <div style="width:6px;height:6px;border-radius:50%;background:var(--coral);margin-top:7px;flex:none;"></div>
         <div style="flex:1;font-size:13.5px;">
-        <b>${escapeHtml(a.actorName || "Someone")}</b>${a.actorRole === "project-manager" ? " (PM)" : ""} deleted <b>${escapeHtml(a.taskTitle || "a task")}</b>
+        <b>${escapeHtml(a.actorName || "Someone")}</b>${a.actorRole === "project-manager" ? " (PM)" : ""} deleted <b>${escapeHtml(a.taskTitle || "a project")}</b>
         <div class="hint" style="margin-top:2px;">${fmtDate(a.date)}</div>
         </div>
     </div>`,
@@ -446,7 +446,7 @@ export function taskDetailBodyHtml(t, { alwaysShowFiles = false } = {}) {
 
     let body = "";
     if (t.updateRequested) {
-        body += `<div class="update-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>An update has been requested on this task.</div>`;
+        body += `<div class="update-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>An update has been requested on this project.</div>`;
     }
     body += `<p style="color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin-top:0;">${escapeHtml(t.description || "No description provided.")}</p>`;
     body += `<div class="detail-meta-grid">
@@ -470,68 +470,170 @@ export function taskDetailBodyHtml(t, { alwaysShowFiles = false } = {}) {
 }
 
 /* ================= STATUS CHART ================= */
+/* WWDC-style 3D ring. Drawn as plain SVG (no chart library needed): each
+   status is a thick arc with round end-caps, tilted back and stacked
+   layer-by-layer to give it depth. */
 const STATUS_CHART_KEYS = ["todo", "in-progress", "review", "done", "overdue"];
 const STATUS_CHART_LABELS = ["To Do", "In Progress", "Review", "Done", "Overdue"];
-const STATUS_CHART_COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#22c55e", "#ef4444"];
+const STATUS_CHART_COLORS = ["#8e8e93", "#0a84ff", "#ff9f0a", "#30d158", "#ff453a"];
+const CHART_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif';
 
-/** Draws (or redraws) the status doughnut and returns the Chart instance.
- *  Pass the previous instance so it can be destroyed first. */
+/* --- look & feel: tweak these --- */
+const RING = {
+    W: 420, H: 244,      // drawing size
+    CX: 210, CY: 104,    // centre of the ring's top face
+    R: 108,              // radius of the ring's centre line
+    T: 35,               // ring thickness (also = corner roundness: caps are T/2 radius)
+    TILT: 0.62,          // 1 = flat top-down, lower = more tilted
+    DEPTH: 24,           // 3D thickness in px
+    GAP: 7,              // visible gap between segments
+};
+
+function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    const c = (v) => Math.max(0, Math.min(255, Math.round(v * f)));
+    return `rgb(${c((n >> 16) & 255)},${c((n >> 8) & 255)},${c(n & 255)})`;
+}
+
+function arcPath(a0, a1, r) {
+    const p = (a) => `${(r * Math.cos(a)).toFixed(2)} ${(r * Math.sin(a)).toFixed(2)}`;
+    return `M ${p(a0)} A ${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${p(a1)}`;
+}
+
+let chartStyleAdded = false;
+function ensureChartStyles() {
+    if (chartStyleAdded) return;
+    chartStyleAdded = true;
+    const st = document.createElement("style");
+    st.textContent = `
+    .tf-chart{position:relative;width:100%;max-width:440px;margin:0 auto;font-family:${CHART_FONT}}
+    .tf-chart svg{display:block;width:100%;height:auto;overflow:visible}
+    .tf-ring{transform-origin:50% 45%;animation:tf-in .7s cubic-bezier(.2,.8,.2,1) both}
+    @keyframes tf-in{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+    .tf-seg{transition:transform .28s cubic-bezier(.2,.8,.2,1),filter .2s}
+    .tf-seg.hov{transform:translateY(-11px);filter:brightness(1.07)}
+    .tf-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px;margin-top:6px}
+    .tf-leg{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:#424245;cursor:default}
+    .tf-leg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+    .tf-leg b{color:#8e8e93;font-weight:600}
+    .tf-leg.hov{color:#1d1d1f}
+    .tf-tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .15s;z-index:5;
+      background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      border-radius:12px;padding:9px 12px;font-size:13px;color:#1d1d1f;white-space:nowrap;
+      box-shadow:0 6px 24px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
+    .tf-tip.on{opacity:1}
+    .tf-tip span{color:#6e6e73}`;
+    document.head.appendChild(st);
+}
+
+/** Pure function: returns the chart markup for a set of counts (one per status). */
+function buildStatusChartHtml(counts) {
+    const { W, H, CX, CY, R, T, TILT, DEPTH, GAP } = RING;
+    const total = counts.reduce((a, b) => a + b, 0);
+
+    const segs = STATUS_CHART_LABELS.map((name, i) => ({
+        i, name, count: counts[i], color: STATUS_CHART_COLORS[i],
+    })).filter((s) => s.count > 0);
+
+    // a "shape" is what we draw per layer: an arc with round caps, or a full ring
+    let angle = -Math.PI / 2;
+    const shapes = segs.map((s) => {
+        const span = (s.count / total) * Math.PI * 2;
+        const start = angle;
+        angle += span;
+        const inset = (T / 2 + GAP / 2) / R;
+        let a0 = start + inset, a1 = start + span - inset;
+        if (a1 <= a0) { a0 = start + span / 2; a1 = a0 + 0.001; } // tiny slice → round dot
+        return { ...s, a0, a1 };
+    });
+    const full = total === 0 || shapes.length === 1;
+    if (total === 0) shapes.push({ i: -1, name: "No projects", count: 0, color: "#e5e5ea" });
+
+    const draw = (sh, color, extra = "") =>
+        full
+            ? `<circle r="${R}" fill="none" stroke="${color}" stroke-width="${T}" class="tf-seg" data-i="${sh.i}" ${extra}/>`
+            : `<path d="${arcPath(sh.a0, sh.a1, R)}" fill="none" stroke="${color}" stroke-width="${T}" stroke-linecap="round" class="tf-seg" data-i="${sh.i}" ${extra}/>`;
+
+    // bottom layer first → top face last
+    let layers = "";
+    for (let d = DEPTH; d >= 0; d--) {
+        const paths = shapes
+            .map((sh) => {
+                const color = d === 0 ? sh.color : shade(sh.color, 0.82 - 0.2 * (d / DEPTH));
+                return draw(sh, color);
+            })
+            .join("");
+        layers += `<g transform="translate(${CX},${CY + d}) scale(1,${TILT})">${paths}</g>`;
+    }
+
+    // soft highlight along the top edge for a glassy, rounded look
+    const shine = shapes
+        .map((sh) => {
+            if (full) {
+                return `<circle r="${R + T * 0.14}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${T * 0.3}" class="tf-seg" data-i="${sh.i}" pointer-events="none"/>`;
+            }
+            const extra = (T * 0.32) / R;
+            const a0 = sh.a0 + extra, a1 = Math.max(sh.a1 - extra, a0 + 0.001);
+            return `<path d="${arcPath(a0, a1, R + T * 0.14)}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${T * 0.3}" stroke-linecap="round" class="tf-seg" data-i="${sh.i}" pointer-events="none"/>`;
+        })
+        .join("");
+
+    const shadowRx = R + T / 2 + 6;
+    const svg = `
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Project status: ${total} projects">
+      <defs><filter id="tf-blur" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter></defs>
+      <ellipse cx="${CX}" cy="${CY + DEPTH + 10}" rx="${shadowRx}" ry="${shadowRx * TILT * 0.9}" fill="#000" opacity=".16" filter="url(#tf-blur)"/>
+      <g class="tf-ring">
+        ${layers}
+        <g transform="translate(${CX},${CY}) scale(1,${TILT})">${shine}</g>
+      </g>
+      <text x="${CX}" y="${CY - 100 }" text-anchor="middle" font-family='${CHART_FONT}' font-size="50" font-weight="700" fill="#b4b4b4">Total: ${total}</text>
+    </svg>`;
+
+    const legend = STATUS_CHART_LABELS.map(
+        (n, i) => `<span class="tf-leg" data-i="${i}"><i style="background:${STATUS_CHART_COLORS[i]}"></i>${n} <b>${counts[i]}</b></span>`,
+    ).join("");
+
+    return `<div class="tf-chart">${svg}<div class="tf-tip"></div><div class="tf-legend">${legend}</div></div>`;
+}
+
+/** Draws (or redraws) the 3D status ring into the container. */
 export function drawStatusChart(containerId, tasks) {
+    const host = document.getElementById(containerId);
+    if (!host) return;
+    ensureChartStyles();
 
     const counts = STATUS_CHART_KEYS.map(
-        key => tasks.filter(
-            t => effectiveStatus(t) === key
-        ).length
+        (key) => tasks.filter((t) => effectiveStatus(t) === key).length,
     );
+    const total = counts.reduce((a, b) => a + b, 0);
+    host.innerHTML = buildStatusChartHtml(counts);
 
-    Highcharts.chart(containerId, {
+    const root = host.querySelector(".tf-chart");
+    const tip = root.querySelector(".tf-tip");
+    const setHover = (i) => {
+        root.querySelectorAll(".hov").forEach((n) => n.classList.remove("hov"));
+        if (i == null || i < 0) return;
+        root.querySelectorAll(`.tf-seg[data-i="${i}"], .tf-leg[data-i="${i}"]`).forEach((n) => n.classList.add("hov"));
+    };
 
-        chart: {
-            type: 'pie',
-            options3d: {
-                enabled: true,
-                alpha: 45,
-                beta: 0
-            },
-            backgroundColor: 'transparent'
-        },
-
-        title: {
-            text: null
-        },
-
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                innerSize: '40%' ,
-                depth: 35,
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.name}: {point.y}'
-                }
-            }
-        },
-
-        series: [{
-            name: 'Tasks',
-            data: [
-                ['To Do', counts[0]],
-                ['In Progress', counts[1]],
-                ['Review', counts[2]],
-                ['Done', counts[3]],
-                ['Overdue', counts[4]]
-            ]
-        }],
-
-        credits: {
-            enabled: false
-        },
-
-        exporting: {
-            enabled: false
+    root.addEventListener("mousemove", (e) => {
+        const el = e.target.closest?.(".tf-seg, .tf-leg");
+        const i = el ? Number(el.dataset.i) : null;
+        setHover(i);
+        if (el && i >= 0 && total) {
+            const box = root.getBoundingClientRect();
+            tip.innerHTML = `<b style="color:${STATUS_CHART_COLORS[i]}">●</b> <b>${STATUS_CHART_LABELS[i]}</b><br><span>${counts[i]} project${counts[i] === 1 ? "" : "s"} · ${Math.round((counts[i] / total) * 100)}%</span>`;
+            tip.style.left = `${Math.min(e.clientX - box.left + 14, box.width - 140)}px`;
+            tip.style.top = `${e.clientY - box.top - 52}px`;
+            tip.classList.add("on");
+        } else {
+            tip.classList.remove("on");
         }
-
+    });
+    root.addEventListener("mouseleave", () => {
+        setHover(null);
+        tip.classList.remove("on");
     });
 }
 

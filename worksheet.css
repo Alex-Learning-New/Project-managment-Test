@@ -83,7 +83,7 @@
   border-radius: 12px;
   background: var(--lime-pale);
   color: var(--lime-dark);
-  font-family: "Space Grotesk", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, sans-serif;
   font-weight: 700;
   font-size: 13px;
   display: flex;
@@ -104,7 +104,7 @@
 }
 
 .ws-card .field input.ws-readonly {
-  background: #f3f8e6;
+  background: #f2f6fc;
   color: var(--muted);
   font-weight: 600;
   cursor: default;
@@ -114,7 +114,7 @@
 .ws-dropzone {
   border: 2px dashed var(--lime);
   border-radius: 16px;
-  background: #fbfff0;
+  background: #f5f9ff;
   padding: 34px 20px;
   display: flex;
   flex-direction: column;
@@ -255,4 +255,4 @@
   box-shadow: none;
   border-radius: 999px;
   background: transparent;
-} 
+}

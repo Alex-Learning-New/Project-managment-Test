@@ -1,22 +1,31 @@
+/* ============================================================
+   WWDC 2026 theme — Apple "Liquid Glass" look.
+   Token NAMES are unchanged (--lime = primary accent, etc.) so every
+   page/JS file keeps working; only the VALUES changed:
+     --lime  → Apple blue   --paper → system grey background
+   ============================================================ */
 :root {
-  --lime: #a6e000;
-  --lime-dark: #5c8a00;
-  --lime-pale: #eef9d2;
-  --ink: #101b0a;
-  --ink-soft: #1c2418;
-  --paper: #eaffba;
+  --lime: #0071e3;
+  --lime-dark: #0058b0;
+  --lime-pale: #e8f2ff;
+  --ink: #1d1d1f;
+  --ink-soft: #424245;
+  --paper: #f5f5f7;
   --surface: #ffffff;
-  --line: #e1e8d2;
-  --muted: #41423f;
-  --amber: #c98a1f;
-  --amber-bg: #fbf1dd;
-  --teal: #1f8a73;
-  --teal-bg: #e1f3ee;
-  --coral: #c1462f;
-  --coral-bg: #fbe7e2;
-  --slate: #5b6b4e;
-  --slate-bg: #eef2e5;
-  --shadow: 0 1px 2px rgba(16, 27, 10, 0.06), 0 8px 24px rgba(16, 27, 10, 0.06);
+  --line: #e5e5ea;
+  --muted: #6e6e73;
+  --amber: #b86e00;
+  --amber-bg: #fff3dc;
+  --teal: #248a3d;
+  --teal-bg: #e4f6e9;
+  --coral: #d70015;
+  --coral-bg: #ffe8eb;
+  --slate: #6e6e73;
+  --slate-bg: #efeff4;
+  --purple: #5e5ce6;
+  --pink: #ff375f;
+  --glass: rgba(255, 255, 255, 0.72);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.07);
   color-scheme: light;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -37,7 +46,12 @@ html {
 body {
   height: 100%;
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(60% 50% at 8% 0%, rgba(10, 132, 255, 0.14), transparent 70%),
+    radial-gradient(50% 45% at 100% 8%, rgba(191, 90, 242, 0.13), transparent 70%),
+    radial-gradient(55% 45% at 90% 100%, rgba(255, 55, 95, 0.09), transparent 70%);
+  background-attachment: fixed;
   color: var(--ink);
   font-family:
     "Inter",
@@ -51,12 +65,12 @@ h1,
 h2,
 h3,
 .display {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, system-ui, sans-serif;
 }
 
 ::selection {
   background: var(--lime);
-  color: var(--ink);
+  color: #fff;
 }
 
 button {
@@ -105,21 +119,21 @@ a {
 }
 
 .btn-primary {
-  background: var(--ink);
-  color: var(--lime);
+  background: linear-gradient(180deg, #2a8cff, var(--lime));
+  color: #fff;
 }
 
 .btn-primary:hover {
-  background: #050d02;
+  background: #0062c4;
 }
 
 .btn-lime {
   background: var(--lime);
-  color: var(--ink);
+  color: #fff;
 }
 
 .btn-lime:hover {
-  background: #95cc00;
+  background: #0062c4;
 }
 
 .btn-ghost {
@@ -138,7 +152,7 @@ a {
 }
 
 .btn-danger:hover {
-  background: #f6d4cb;
+  background: #ffc9d0;
 }
 
 .btn-sm {
@@ -184,7 +198,7 @@ a {
 .field select:focus,
 .field textarea:focus {
   border-color: var(--lime-dark);
-  box-shadow: 0 0 0 3px rgba(166, 224, 0, 0.25);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.25);
 }
 
 .field textarea {
@@ -227,8 +241,8 @@ a {
 }
 
 .badge-review {
-  background: #e4e9fb;
-  color: #4453b8;
+  background: #ecebff;
+  color: #4b49c8;
 }
 
 .badge-done {
@@ -282,13 +296,11 @@ a {
 .login-brand {
   flex: 1 1 46%;
   background:
-    radial-gradient(
-      circle at 15% 12%,
-      rgba(255, 255, 255, 0.16),
-      transparent 45%
-    ),
-    linear-gradient(155deg, var(--lime) 0%, #8fc400 60%, #6ea300 100%);
-  color: var(--ink);
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.3), transparent 45%),
+    radial-gradient(circle at 85% 88%, rgba(255, 55, 95, 0.6), transparent 52%),
+    radial-gradient(circle at 82% 12%, rgba(191, 90, 242, 0.65), transparent 50%),
+    linear-gradient(155deg, #0a84ff 0%, #5e5ce6 60%, #bf5af2 100%);
+  color: #fff;
   padding: 56px 52px;
   display: flex;
   flex-direction: column;
@@ -306,7 +318,7 @@ a {
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  border: 1px solid rgba(16, 27, 10, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .login-brand::before {
@@ -317,7 +329,7 @@ a {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  border: 1px solid rgba(16, 27, 10, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .brand-mark {
@@ -334,7 +346,7 @@ a {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: var(--ink);
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -380,7 +392,7 @@ a {
 
 .login-stats div b {
   display: block;
-  font-family: "Space Grotesk";
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui;
   font-size: 26px;
 }
 
@@ -457,10 +469,10 @@ a {
 }
 
 .demo-creds code {
-  background: rgba(16, 27, 10, 0.06);
+  background: rgba(0, 0, 0, 0.06);
   padding: 1px 6px;
   border-radius: 5px;
-  font-family: "Space Grotesk";
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui;
 }
 
 /* ---------- APP SHELL ---------- */
@@ -476,8 +488,10 @@ a {
 .sidebar {
   width: 236px;
   flex: none;
-  background: var(--ink);
-  color: #dfe8cf;
+  background: rgba(29, 29, 31, 0.94);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  color: #e5e5ea;
   display: flex;
   flex-direction: column;
   padding: 22px 16px;
@@ -488,17 +502,17 @@ a {
 }
 
 .sidebar .brand-mark {
-  color: var(--lime);
+  color: #fff;
   margin-bottom: 30px;
   padding-left: 6px;
 }
 
 .sidebar .brand-mark .mark {
-  background: var(--lime);
+  background: linear-gradient(135deg, #0a84ff, #bf5af2);
 }
 
 .sidebar .brand-mark .mark span {
-  background: var(--ink);
+  background: #fff;
 }
 
 .nav-group {
@@ -508,7 +522,7 @@ a {
 .nav-label {
   font-size: 11px;
   text-transform: none;
-  color: #7d8a6c;
+  color: #8e8e93;
   font-weight: 600;
   padding: 0 10px;
   margin-bottom: 8px;
@@ -523,7 +537,7 @@ a {
   border-radius: 9px;
   font-size: 14px;
   font-weight: 500;
-  color: #cdd9bb;
+  color: #d1d1d6;
   cursor: pointer;
   margin-bottom: 2px;
   border: none;
@@ -544,7 +558,7 @@ a {
 
 .nav-item.active {
   background: var(--lime);
-  color: var(--ink);
+  color: #fff;
   font-weight: 700;
 }
 
@@ -561,7 +575,7 @@ a {
 }
 
 .nav-item.active .count {
-  background: rgba(16, 27, 10, 0.18);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .sidebar-foot {
@@ -589,13 +603,13 @@ a {
 
 .sidebar-foot .who span {
   font-size: 12px;
-  color: #8fa07c;
+  color: #98989d;
 }
 
 .icon-btn {
   background: none;
   border: none;
-  color: #9fae8c;
+  color: #aeaeb2;
   cursor: pointer;
   padding: 6px;
   border-radius: 7px;
@@ -616,8 +630,9 @@ a {
   position: sticky;
   top: 0;
   z-index: 5;
-  /* background: rgba(246, 249, 239, 0.88); */
-  backdrop-filter: blur(6px);
+  background: rgba(245, 245, 247, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--line);
   padding: 18px 32px;
   display: flex;
@@ -680,7 +695,7 @@ a {
 }
 
 .stat-card .num {
-  font-family: "Space Grotesk";
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui;
   font-size: 30px;
   font-weight: 600;
 }
@@ -770,7 +785,7 @@ a {
 }
 
 .task-row.status-review {
-  border-left-color: #4453b8;
+  border-left-color: #4b49c8;
 }
 
 .task-row.status-done {
@@ -945,7 +960,7 @@ tr.clickable:hover {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(16, 27, 10, 0.45);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 50;
   display: flex;
   align-items: flex-start;
@@ -1146,7 +1161,7 @@ tr.clickable:hover {
 }
 
 .slider-row .pct {
-  font-family: "Space Grotesk";
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui;
   font-size: 20px;
   font-weight: 600;
   width: 56px;
@@ -1265,7 +1280,7 @@ tr.clickable:hover {
 
 .upload-zone:hover {
   border-color: var(--lime);
-  background: rgba(132, 204, 22, 0.05);
+  background: rgba(0, 113, 227, 0.05);
 }
 
 .file-list {
@@ -1391,7 +1406,7 @@ tr.clickable:hover {
 .employee-filters select:focus {
   outline: none;
   border-color: var(--lime);
-  box-shadow: 0 0 0 3px rgba(166, 224, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 .employee-filters input::placeholder {
@@ -1486,7 +1501,7 @@ tr.clickable:hover {
 }
 
 .chart-wrap text {
-  font-size: 10px;
+  /* font-size: 10px; */
 }
 
 .department-grid {
@@ -1620,7 +1635,7 @@ tr.clickable:hover {
 
 #team-message:focus {
   border-color: var(--lime);
-  box-shadow: 0 0 0 3px rgba(180, 255, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 .team-message-actions {

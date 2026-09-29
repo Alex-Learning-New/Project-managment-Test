@@ -143,7 +143,7 @@ function openDetail(id) {
         <div class="mi"><div class="k">Time</div><div class="v">${escapeHtml(r.start_time)} – ${escapeHtml(r.end_time)}</div></div>
         <div class="mi"><div class="k">Total hours</div><div class="v">${formatHours(r.total_hours)}</div></div>
         <div class="mi"><div class="k">Status</div><div class="v">${statusBadge(r.work_status)}</div></div>
-        ${r.task_progress != null ? `<div class="mi"><div class="k">Task progress</div><div class="v">${r.task_progress}%</div></div>` : ""}
+        ${r.task_progress != null ? `<div class="mi"><div class="k">Project progress</div><div class="v">${r.task_progress}%</div></div>` : ""}
         <div class="mi"><div class="k">Submitted</div><div class="v">${new Date(r.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div></div>
       </div>
 

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="worksheet.css" />
@@ -179,7 +179,7 @@
                                         <th>Employee</th>
                                         <th>Department</th>
                                         <th>Team</th>
-                                        <th>Open tasks</th>
+                                        <th>Open projects</th>
                                         <th>Completed</th>
                                         <th>Avg. progress</th>
                                         <th></th>
@@ -237,13 +237,13 @@
     <div class="modal-backdrop hidden" id="modal-create-task">
         <div class="modal">
             <div class="modal-head">
-                <h3>New task</h3>
+                <h3>New project</h3>
                 <button class="modal-close" data-close>✕</button>
             </div>
             <form id="form-create-task">
                 <div class="modal-body">
                     <div class="field">
-                        <label>Task title</label><input type="text" id="ct-title" required
+                        <label>Project title</label><input type="text" id="ct-title" required
                             placeholder="e.g. Redesign onboarding flow" />
                     </div>
                     <div class="field">
@@ -292,7 +292,7 @@
                 </div>
                 <div class="modal-foot">
                     <button type="button" class="btn btn-ghost" data-close>Cancel</button>
-                    <button type="submit" class="btn btn-lime">Create task</button>
+                    <button type="submit" class="btn btn-lime">Create project</button>
                 </div>
             </form>
         </div>
@@ -302,7 +302,7 @@
     <div class="modal-backdrop hidden" id="modal-task-detail">
         <div class="modal" style="max-width: 600px">
             <div class="modal-head">
-                <h3 id="td-title">Task</h3>
+                <h3 id="td-title">Project</h3>
                 <button class="modal-close" data-close>✕</button>
             </div>
             <div class="modal-body" id="td-body"></div>
@@ -328,4 +328,4 @@
     <script type="module" src="js/pm.js"></script>
 </body>
 
-</html> 
+</html>
