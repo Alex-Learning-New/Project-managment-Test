@@ -483,7 +483,7 @@ const RING = {
     W: 420, H: 244,      // drawing size
     CX: 210, CY: 104,    // centre of the ring's top face
     R: 108,              // radius of the ring's centre line
-    T: 35,               // ring thickness (also = corner roundness: caps are T/2 radius)
+    T: 34,               // ring thickness (also = corner roundness: caps are T/2 radius)
     TILT: 0.62,          // 1 = flat top-down, lower = more tilted
     DEPTH: 24,           // 3D thickness in px
     GAP: 7,              // visible gap between segments
@@ -587,7 +587,8 @@ function buildStatusChartHtml(counts) {
         ${layers}
         <g transform="translate(${CX},${CY}) scale(1,${TILT})">${shine}</g>
       </g>
-      <text x="${CX}" y="${CY - 100 }" text-anchor="middle" font-family='${CHART_FONT}' font-size="50" font-weight="700" fill="#b4b4b4">Total: ${total}</text>
+      <text x="${CX}" y="${CY + 10}" text-anchor="middle" font-family='${CHART_FONT}' font-size="40" font-weight="700" fill="#1d1d1f">${total}</text>
+      <text x="${CX}" y="${CY + 32}" text-anchor="middle" font-family='${CHART_FONT}' font-size="13" font-weight="500" fill="#6e6e73">${total === 1 ? "Project" : "Projects"}</text>
     </svg>`;
 
     const legend = STATUS_CHART_LABELS.map(

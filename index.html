@@ -36,7 +36,7 @@
         <div></div>
       </div>
       <div class="login-form-wrap">
-        <form class="login-form" id="login-form" autocomplete="off">
+        <form class="login-form" id="login-form">
           <h2>Sign in</h2>
           <p class="sub">Enter your ID and password to continue.</p>
 
@@ -46,6 +46,11 @@
               id="login-id"
               type="text"
               placeholder="e.g. admin1 or emp3"
+              autocomplete="username"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+              enterkeyhint="next"
               required
             />
           </div>
@@ -55,6 +60,8 @@
               id="login-pass"
               type="password"
               placeholder="••••••••"
+              autocomplete="current-password"
+              enterkeyhint="go"
               required
             />
           </div>
