@@ -10,6 +10,7 @@ import {
     currentUser, logActivity, recentActivityHtml
 } from "./common.js";
 import { renderAdminWorksheets } from "./admin-worksheets.js";
+import { emailEmployeesUpdateRequest } from "./notify.js";
 import { uploadFiles, MAX_FILE_MB } from "./storage.js";
 import "./file-preview.js";
 
@@ -468,16 +469,28 @@ function renderAdminPeople() {
                 }
                 const ids = myTasks.map(t => t.id);
 
-                await supabase
+                const { error } = await supabase
                     .from("tasks")
                     .update({
                         update_requested: true
                     })
                     .in("id", ids);
 
+                if (error) {
+                    toast(error.message, "error");
+                    return;
+                }
+
                 await loadData();
 
                 toast(`Update requested from ${getUser(uid).name}.`);
+
+                /* email just this employee, listing their open projects */
+                emailEmployeesUpdateRequest({
+                    taskIds: ids,
+                    employeeIds: [uid],
+                    requesterId: currentUser().id,
+                });
             });
         });
 }
@@ -550,12 +563,32 @@ function openTaskDetail(taskId) {
     </select>
     `;
 
-    document.getElementById("td-ask-update").addEventListener("click", () => {
-        t.updateRequested = true;
+    document.getElementById("td-ask-update").addEventListener("click", async () => {
+        const btn = document.getElementById("td-ask-update");
+        btn.disabled = true;
+
+        const { error } = await supabase
+            .from("tasks")
+            .update({ update_requested: true })
+            .eq("id", t.id);
+
+        if (error) {
+            toast(error.message, "error");
+            btn.disabled = false;
+            return;
+        }
+
+        await loadData();
 
         toast("Update requested.", "success");
         openTaskDetail(taskId);
         rerenderCurrent();
+
+        /* email everyone assigned to this project */
+        emailEmployeesUpdateRequest({
+            taskIds: [t.id],
+            requesterId: currentUser().id,
+        });
     });
 
     document.getElementById("td-delete-task").addEventListener("click", async () => {

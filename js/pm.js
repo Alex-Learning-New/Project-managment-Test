@@ -10,6 +10,7 @@ import {
     tasksManagedBy, teamsInTasks, employeesInTasks, logActivity, recentActivityHtml
 } from "./common.js";
 import { renderPmWorksheets } from "./admin-worksheets.js";
+import { emailEmployeesUpdateRequest } from "./notify.js";
 import { uploadFiles, MAX_FILE_MB } from "./storage.js";
 import "./file-preview.js";
 
@@ -258,15 +259,27 @@ function renderPMPeople() {
                 }
                 const ids = openTasks.map((t) => t.id);
 
-                await supabase
+                const { error } = await supabase
                     .from("tasks")
                     .update({ update_requested: true })
                     .in("id", ids);
+
+                if (error) {
+                    toast(error.message, "error");
+                    return;
+                }
 
                 await loadData();
                 rerenderCurrent();
 
                 toast(`Update requested from ${user.name}.`);
+
+                /* email just this employee, listing their open projects */
+                emailEmployeesUpdateRequest({
+                    taskIds: ids,
+                    employeeIds: [uid],
+                    requesterId: currentUser().id,
+                });
             });
         });
 }
@@ -349,6 +362,12 @@ function openTaskDetail(taskId) {
 
         toast("Update requested.", "success");
         openTaskDetail(taskId);
+
+        /* email everyone assigned to this project */
+        emailEmployeesUpdateRequest({
+            taskIds: [t.id],
+            requesterId: currentUser().id,
+        });
     });
 
     document

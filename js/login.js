@@ -1,7 +1,13 @@
 "use strict";
 
 import { supabase } from "./supabase.js";
-import { getSessionUserId, setSession, pageForRole } from "./common.js";
+import {
+    getSessionUserId,
+    setSession,
+    clearSession,
+    pageForRole,
+    confirmDialog,
+} from "./common.js";
 
 /* ============================================================
     login.js — sign-in page (index.html)
@@ -42,7 +48,21 @@ async function findRoleById(id) {
 
     const person = await findRoleById(sessionId);
 
-    if (person) {
+    if (!person) return;
+
+    // Still signed in: ask instead of silently bouncing back to the dashboard
+    // (this is what the browser Back button hits after leaving a dashboard).
+    const signOutInstead = await confirmDialog({
+        title: "You're still signed in",
+        message:
+            "Do you want to sign out, or go back to your dashboard?",
+        confirmText: "Sign out",
+        cancelText: "Back to dashboard",
+    });
+
+    if (signOutInstead) {
+        clearSession();
+    } else {
         window.location.replace(pageForRole(person.role));
     }
 

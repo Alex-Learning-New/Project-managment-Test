@@ -318,15 +318,9 @@ function openTaskDetail(taskId) {
                     return;
                 }
 
-                uploadedFiles.forEach(file => {
-                    file.uploadedAt = new Date().toISOString();
-
-                    file.uploadedBy = {
-                        id: currentUser().id,
-                        name: currentUser().name,
-                        role: currentUser().role
-                    };
-                });
+                const uploaded = await uploadFiles(pendingFiles, `tasks/${t.id}`);
+                uploaded.forEach((file) => { /* uploadedAt / uploadedBy */ });
+                updatedFiles.push(...uploaded);
                 
             }
 

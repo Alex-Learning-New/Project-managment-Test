@@ -1,0 +1,437 @@
+/* ============================================================
+   glass.css — Glassmorphism layer for TaskFlow
+   Load LAST on every page (after styles.css, worksheet.css and,
+   on index.html, mobile.css). It only overrides colours, borders,
+   shadows and adds backdrop-filter; no layout is changed, so it can
+   be removed by deleting the <link> tag.
+   ============================================================ */
+
+:root {
+     --glass-blur: 20px;
+     --glass-sat: 170%;
+
+     --glass-bg: rgba(255, 255, 255, 0.55);
+     --glass-bg-strong: rgba(255, 255, 255, 0.76);
+     --glass-bg-soft: rgba(255, 255, 255, 0.38);
+     --glass-border: rgba(255, 255, 255, 0.7);
+     --glass-hairline: rgba(20, 30, 70, 0.08);
+
+     --glass-shadow:
+          0 0 0 0.5px rgba(20, 30, 70, 0.05),
+          0 8px 32px rgba(31, 38, 90, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.85);
+     --glass-shadow-lg:
+          0 0 0 0.5px rgba(20, 30, 70, 0.06),
+          0 24px 60px rgba(31, 38, 90, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+     --glass-dark: rgba(24, 24, 32, 0.62);
+}
+
+/* ---------- Backdrop: something colourful for the glass to blur ---------- */
+body {
+     background-color: #eef1fb;
+     background-image: none;
+     background-attachment: scroll;
+}
+
+body::before {
+     content: "";
+     position: fixed;
+     inset: 0;
+     z-index: -1;
+     pointer-events: none;
+     background:
+          radial-gradient(45% 40% at 8% 6%, rgba(10, 132, 255, 0.42), transparent 70%),
+          radial-gradient(40% 40% at 95% 10%, rgba(191, 90, 242, 0.38), transparent 70%),
+          radial-gradient(45% 45% at 85% 95%, rgba(255, 55, 95, 0.28), transparent 70%),
+          radial-gradient(40% 40% at 10% 90%, rgba(48, 209, 88, 0.22), transparent 70%),
+          linear-gradient(180deg, #f2f4fd 0%, #eaeefa 100%);
+}
+
+/* ---------- Glass surfaces ---------- */
+.panel,
+.stat-card,
+.team-card,
+.department-card,
+.team-message-box,
+.ws-card,
+.ws-today,
+#selected-team-area .panel {
+     background: var(--glass-bg);
+     border: 1px solid var(--glass-border);
+     box-shadow: var(--glass-shadow);
+     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+/* the "My team" list panel is intentionally transparent in styles.css */
+#emp-team-content>.panel:first-child {
+     background: transparent;
+     border: none;
+     box-shadow: none;
+     -webkit-backdrop-filter: none;
+     backdrop-filter: none;
+}
+
+/* Cards that sit INSIDE a glass panel: lighter tint, no second blur
+   (nested blur is invisible and costs performance) */
+.panel .stat-card,
+.panel .team-card,
+.panel .team-message-box,
+.panel .department-card {
+     background: var(--glass-bg-soft);
+     border-color: rgba(255, 255, 255, 0.6);
+     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+     -webkit-backdrop-filter: none;
+     backdrop-filter: none;
+}
+
+.team-card:hover {
+     background: var(--glass-bg-strong);
+     box-shadow: var(--glass-shadow-lg);
+}
+
+.panel-head,
+.ws-card-head,
+.modal-head,
+.modal-foot,
+th,
+td {
+     border-color: var(--glass-hairline);
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+     background: rgba(255, 255, 255, 0.5);
+     border-bottom: 1px solid var(--glass-border);
+     box-shadow: 0 1px 0 var(--glass-hairline), 0 8px 24px rgba(31, 38, 90, 0.05);
+     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+/* ---------- Sidebar (dark glass, keeps the light nav text readable) ---------- */
+.sidebar {
+     background: var(--glass-dark);
+     border-right: 1px solid rgba(255, 255, 255, 0.12);
+     box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+     -webkit-backdrop-filter: blur(28px) saturate(180%);
+     backdrop-filter: blur(28px) saturate(180%);
+}
+
+.nav-item.active {
+     background: rgba(10, 132, 255, 0.85);
+     box-shadow: 0 4px 14px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-item:hover {
+     background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Modals ---------- */
+.modal-backdrop {
+     background: rgba(20, 24, 50, 0.3);
+     -webkit-backdrop-filter: blur(6px);
+     backdrop-filter: blur(6px);
+}
+
+.modal {
+     background: var(--glass-bg-strong);
+     border: 1px solid var(--glass-border);
+     box-shadow: var(--glass-shadow-lg);
+     -webkit-backdrop-filter: blur(30px) saturate(180%);
+     backdrop-filter: blur(30px) saturate(180%);
+}
+
+.modal-close:hover {
+     background: rgba(255, 255, 255, 0.6);
+}
+
+.sidebar-scrim {
+     -webkit-backdrop-filter: blur(4px);
+     backdrop-filter: blur(4px);
+}
+
+/* ---------- Inner tiles ---------- */
+.detail-meta-grid .mi,
+.file-item,
+.member-chip,
+.selected-chip,
+.file-chip,
+.ws-file-chip,
+.department-member {
+     background: rgba(255, 255, 255, 0.5);
+     border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.detail-meta-grid .mi,
+.file-item {
+     border-radius: 10px;
+}
+
+.task-row:hover,
+tr.clickable:hover {
+     background: rgb(255, 255, 255);
+     border: solid 1px #69696915;
+     box-shadow: 1px 1px 10px 10px #1d1d1f18;
+}
+
+.checkbox-item:hover {
+     background: rgba(255, 255, 255, 0.55);
+}
+
+.pbar {
+     background: rgba(20, 30, 70, 0.1);
+}
+
+.assignee-stack .avatar {
+     border-color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Inputs ---------- */
+.field input,
+.field select,
+.field textarea,
+.employee-filters input,
+.employee-filters select,
+#team-message,
+#td-report-text,
+.checkbox-list {
+     background: rgba(255, 255, 255, 0.6);
+     border-color: rgba(255, 255, 255, 0.8);
+     box-shadow: inset 0 1px 2px rgba(20, 30, 70, 0.06);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.employee-filters input:focus,
+.employee-filters select:focus,
+#team-message:focus {
+     background: rgba(255, 255, 255, 0.92);
+     border-color: var(--lime);
+     box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.22);
+}
+
+.ws-card .field input.ws-readonly {
+     background: rgba(255, 255, 255, 0.35);
+}
+
+.ws-card .field input[type="range"] {
+     background: transparent;
+     box-shadow: none;
+}
+
+.btn-ghost {
+     background: rgba(255, 255, 255, 0.5);
+     border-color: rgba(20, 30, 70, 0.14);
+     -webkit-backdrop-filter: blur(10px);
+     backdrop-filter: blur(10px);
+}
+
+.btn-ghost:hover {
+     background: rgba(255, 255, 255, 0.85);
+}
+
+.btn-primary,
+.btn-lime {
+     box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- Upload / drop zones ---------- */
+.upload-zone,
+.ws-dropzone {
+     background: rgba(255, 255, 255, 0.35);
+     border-color: rgba(0, 113, 227, 0.45);
+}
+
+.upload-zone:hover,
+.ws-dropzone:hover,
+.ws-dropzone.drag {
+     background: rgba(232, 242, 255, 0.75);
+}
+
+.ws-drop-icon,
+.ws-num {
+     background: rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Toasts ---------- */
+.toast {
+     border: 1px solid rgba(255, 255, 255, 0.35);
+     -webkit-backdrop-filter: blur(16px) saturate(170%);
+     backdrop-filter: blur(16px) saturate(170%);
+}
+
+.toast-success {
+     background: rgba(22, 163, 74, 0.82);
+}
+
+.toast-error {
+     background: rgba(220, 38, 38, 0.82);
+}
+
+.toast-info {
+     background: rgba(37, 99, 235, 0.82);
+}
+
+/* ---------- Login ---------- */
+.login-form-wrap {
+     background: transparent;
+}
+
+.login-form {
+     padding: 36px 34px 30px;
+     background: var(--glass-bg-strong);
+     border: 1px solid var(--glass-border);
+     border-radius: 24px;
+     box-shadow: var(--glass-shadow-lg);
+     -webkit-backdrop-filter: blur(28px) saturate(180%);
+     backdrop-filter: blur(28px) saturate(180%);
+}
+
+.demo-creds {
+     background: rgba(232, 242, 255, 0.6);
+     border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Mobile / tablet ---------- */
+@media (max-width: 880px) {
+
+     /* the sheet itself is the glass panel on phones, so drop the inner card */
+     .login-form-wrap {
+          background: rgba(255, 255, 255, 0.74);
+          border-top: 1px solid var(--glass-border);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          backdrop-filter: blur(28px) saturate(180%);
+     }
+
+     .login-form {
+          padding: 0;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+     }
+
+     .login-form .field input {
+          background: rgba(255, 255, 255, 0.65);
+          border-color: rgba(20, 30, 70, 0.08);
+     }
+
+     .login-form .field input:focus {
+          background: #fff;
+          border-color: var(--lime);
+     }
+}
+
+@media (max-width: 768px) {
+     :root {
+          --glass-blur: 14px;
+          /* lighter blur = smoother scrolling on phones */
+     }
+
+     .modal-head,
+     .modal-foot {
+          background: rgba(255, 255, 255, 0.6);
+          -webkit-backdrop-filter: blur(16px);
+          backdrop-filter: blur(16px);
+     }
+
+     .ws-today {
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+     }
+}
+
+/* ---------- Scrollbars ---------- */
+/* Chrome / Edge / Safari: slim frosted pill, transparent track */
+::-webkit-scrollbar {
+     width: 12px;
+     height: 12px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece,
+::-webkit-scrollbar-corner {
+     background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+     background: rgba(70, 80, 130, 0.32);
+     border: 3px solid transparent;
+     /* makes the pill float inside the track */
+     background-clip: padding-box;
+     border-radius: 999px;
+     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+::-webkit-scrollbar-thumb:hover {
+     background: rgba(0, 113, 227, 0.55);
+     background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+     background: rgba(0, 113, 227, 0.75);
+     background-clip: padding-box;
+}
+
+/* on the dark glass sidebar the thumb needs to be light */
+.sidebar::-webkit-scrollbar-thumb,
+.sidebar ::-webkit-scrollbar-thumb {
+     background: rgba(255, 255, 255, 0.28);
+     background-clip: padding-box;
+     box-shadow: none;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.sidebar ::-webkit-scrollbar-thumb:hover {
+     background: rgba(255, 255, 255, 0.5);
+     background-clip: padding-box;
+}
+
+/* Firefox has no ::-webkit-scrollbar, so it gets the standard properties.
+   (Chrome 121+ would ignore the rules above if these applied there too.) */
+@supports not selector(::-webkit-scrollbar) {
+     * {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(70, 80, 130, 0.4) transparent;
+     }
+
+     .sidebar,
+     .sidebar * {
+          scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+     }
+}
+
+/* ---------- Fallbacks ---------- */
+/* Browsers without backdrop-filter: use near-opaque surfaces so text stays readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+     :root {
+          --glass-bg: rgba(255, 255, 255, 0.92);
+          --glass-bg-strong: rgba(255, 255, 255, 0.97);
+          --glass-bg-soft: rgba(255, 255, 255, 0.8);
+          --glass-dark: rgba(29, 29, 31, 0.96);
+     }
+
+     .topbar {
+          background: rgba(245, 245, 247, 0.95);
+     }
+}
+
+/* Users who ask their OS for reduced transparency get solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+     :root {
+          --glass-bg: #ffffff;
+          --glass-bg-strong: #ffffff;
+          --glass-bg-soft: #f5f5f7;
+          --glass-dark: #1d1d1f;
+     }
+
+     * {
+          -webkit-backdrop-filter: none !important;
+          backdrop-filter: none !important;
+     }
+}

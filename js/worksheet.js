@@ -295,6 +295,20 @@ async function submitWorksheet() {
     const task = taskById(projectVal);
     const progress = task ? parseInt($("ws-progress").value, 10) : null;
 
+    if (task && progress === (task.progress ?? 0)) {
+        return (errEl.textContent =
+            "Project progress has not changed. Please update the progress before submitting.");
+    }
+
+    if (task) {
+        const progress = parseInt($("ws-progress").value, 10);
+
+        if (status === "completed" && progress < 100) {
+            return (errEl.textContent =
+                "Work status cannot be Completed unless project progress is 100%.");
+        }
+    }
+
     const btn = $("ws-submit");
     btn.disabled = true;
     btn.textContent = "Submitting…";
@@ -349,6 +363,13 @@ async function submitWorksheet() {
                     ],
                 })
                 .eq("id", task.id);
+            console.log("[ws] email check", {
+                taskId: task?.id,
+                pm: task?.projectManagerId,
+                oldProgress: task?.progress,
+                newProgress: progress,
+            });
+
             if (taskErr) taskWarning = taskErr.message;
             else if (progress !== (task.progress ?? 0)) {
                 /* tell the project manager (runs in the background) */

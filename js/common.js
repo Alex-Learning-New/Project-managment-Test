@@ -40,7 +40,10 @@ export function initials(name) {
 
 export function avatarHtml(user, size) {
     const cls = size === "lg" ? "avatar avatar-lg" : "avatar";
-    return `<div class="${cls}" style="background:${colorFor(user.id)}">${initials(user.name)}</div>`;
+    const inner = user.avatar_url
+        ? `<img src="${escapeHtml(user.avatar_url)}" alt="" loading="lazy" />`
+        : initials(user.name);
+    return `<div class="${cls}" style="background:${colorFor(user.id)}">${inner}</div>`;
 }
 
 export function escapeHtml(s) {
@@ -334,7 +337,7 @@ export function taskRowHtml(t) {
         .slice(0, 3)
         .map(
             (u) =>
-                `<div class="avatar" style="background:${colorFor(u.id)}">${initials(u.name)}</div>`,
+                avatarHtml(u),
         )
         .join("");
     return `<div class="task-row status-${es === "overdue" ? "overdue" : t.status}" data-task="${t.id}">
@@ -672,6 +675,147 @@ document.addEventListener("click", async (e) => {
     }
 });
 
+/* ================= CONFIRM DIALOG ================= */
+let confirmPending = null;
+
+/**
+ * Promise-based confirmation dialog (reuses the .modal styles, so it picks
+ * up the glass theme automatically). Resolves true on confirm, false on
+ * cancel / Esc / backdrop click. Only one can be open at a time.
+ */
+export function confirmDialog({
+    title = "Are you sure?",
+    message = "",
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+} = {}) {
+    if (confirmPending) return confirmPending;
+
+    confirmPending = new Promise((resolve) => {
+        const previouslyFocused = document.activeElement;
+
+        const bd = document.createElement("div");
+        bd.className = "modal-backdrop";
+        bd.style.zIndex = "10000";
+        bd.innerHTML = `
+          <div class="modal" role="alertdialog" aria-modal="true"
+               aria-labelledby="cf-title" aria-describedby="cf-msg"
+               style="max-width:420px;margin-top:30vh">
+            <div class="modal-head"><h3 id="cf-title">${escapeHtml(title)}</h3></div>
+            <div class="modal-body" id="cf-msg"
+                 style="font-size:14.5px;line-height:1.55;color:var(--ink-soft)">${escapeHtml(message)}</div>
+            <div class="modal-foot">
+              <button type="button" class="btn btn-ghost" data-cf="cancel">${escapeHtml(cancelText)}</button>
+              <button type="button" class="btn btn-lime" data-cf="ok">${escapeHtml(confirmText)}</button>
+            </div>
+          </div>`;
+
+        const cancelBtn = bd.querySelector('[data-cf="cancel"]');
+        const okBtn = bd.querySelector('[data-cf="ok"]');
+
+        const close = (result) => {
+            window.removeEventListener("keydown", onKey, true);
+            bd.remove();
+            confirmPending = null;
+            if (previouslyFocused?.focus) previouslyFocused.focus();
+            resolve(result);
+        };
+
+        // Capture phase so Esc closes only this dialog, not the ones underneath
+        const onKey = (e) => {
+            if (e.key === "Escape") {
+                e.preventDefault();
+                e.stopPropagation();
+                close(false);
+            } else if (e.key === "Tab") {
+                // keep focus inside the dialog
+                const first = cancelBtn;
+                const last = okBtn;
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+
+        cancelBtn.addEventListener("click", () => close(false));
+        okBtn.addEventListener("click", () => close(true));
+        bd.addEventListener("click", (e) => {
+            if (e.target === bd) close(false);
+        });
+        window.addEventListener("keydown", onKey, true);
+
+        document.body.appendChild(bd);
+        cancelBtn.focus(); // safest default: Enter does NOT sign out
+    });
+
+    return confirmPending;
+}
+
+/** Ends the session and returns to the login page. */
+export function signOut() {
+    try {
+        sessionStorage.removeItem(`taskflow.view.${state.currentUser}`);
+    } catch (e) {
+        /* ignore */
+    }
+    clearSession();
+    window.location.replace("index.html");
+}
+
+/** Asks before signing out. Resolves true if the user agreed (and signs out). */
+export async function confirmSignOut() {
+    const ok = await confirmDialog({
+        title: "Sign out?",
+        message:
+            "You'll be returned to the login page. Anything you haven't submitted yet, such as a worksheet in progress, will be lost.",
+        confirmText: "Sign out",
+        cancelText: "Stay signed in",
+    });
+    if (ok) signOut();
+    return ok;
+}
+
+/**
+ * Stops the browser Back button / swipe-back from silently leaving the
+ * dashboard. A guard history entry is added after the first user
+ * interaction (Chrome ignores entries created without one). Pressing Back
+ * then asks for confirmation; "Stay signed in" puts the guard back.
+ */
+function installBackGuard() {
+    const GUARD = { taskflowGuard: true };
+    let armed = false;
+
+    const arm = () => {
+        if (history.state?.taskflowGuard) return;
+        history.pushState(GUARD, "", window.location.href);
+    };
+
+    const armOnFirstInteraction = () => {
+        if (armed) return;
+        armed = true;
+        arm();
+        ["pointerdown", "keydown", "touchstart"].forEach((t) =>
+            window.removeEventListener(t, armOnFirstInteraction, true),
+        );
+    };
+    ["pointerdown", "keydown", "touchstart"].forEach((t) =>
+        window.addEventListener(t, armOnFirstInteraction, {
+            capture: true,
+            passive: true,
+        }),
+    );
+
+    window.addEventListener("popstate", async (e) => {
+        if (e.state?.taskflowGuard) return; // landed on the guard itself
+        const signedOut = await confirmSignOut();
+        if (!signedOut) arm(); // stay: re-add the guard (runs inside the click's user activation)
+    });
+}
+
 /* ================= MODAL HELPERS ================= */
 export function closeModal(id) {
     document.getElementById(id).classList.add("hidden");
@@ -697,6 +841,77 @@ export function initModals() {
 /* ================= APP SHELL (sidebar, nav, topbar) ================= */
 let shell = null;
 
+const ROLE_LABELS = {
+    admin: "Admin",
+    employee: "Employee",
+    "project-manager": "Project Manager",
+};
+
+const EXTRA_VIEW_TITLES = {
+    profile: ["My profile", "Your photo, contact details and password"],
+};
+
+/* Remember which view is open so a page reload returns to it.
+   sessionStorage = per tab, cleared when the tab closes or on sign-out. */
+const viewKey = () => `taskflow.view.${state.currentUser}`;
+
+function savedView() {
+    try {
+        const id = sessionStorage.getItem(viewKey());
+        return id && document.getElementById("view-" + id) ? id : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function rememberView(viewId) {
+    try {
+        sessionStorage.setItem(viewKey(), viewId);
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+/** Repaints the sidebar footer (photo/initials, name, role) from the
+ *  signed-in person. Call again after the profile changes. */
+export function refreshSidebarUser() {
+    const user = currentUser();
+    if (!user) return;
+    const avatar = document.getElementById("sidebar-avatar");
+    avatar.style.background = colorFor(user.id);
+    avatar.innerHTML = user.avatar_url
+        ? `<img src="${escapeHtml(user.avatar_url)}" alt="" />`
+        : escapeHtml(initials(user.name));
+    document.getElementById("sidebar-name").textContent = user.name;
+    document.getElementById("sidebar-role").textContent =
+        ROLE_LABELS[user.role] || user.role;
+}
+
+/** Avatar + name + role in the sidebar footer open the profile page. */
+function makeSidebarUserClickable() {
+    const foot = document.querySelector(".sidebar-foot");
+    const avatar = document.getElementById("sidebar-avatar");
+    const who = foot?.querySelector(".who");
+    if (!foot || !avatar || !who || foot.querySelector(".sidebar-user")) return;
+
+    const link = document.createElement("div");
+    link.className = "sidebar-user";
+    link.setAttribute("role", "button");
+    link.tabIndex = 0;
+    link.title = "View profile";
+    foot.insertBefore(link, avatar);
+    link.append(avatar, who);
+
+    const open = () => goView("profile");
+    link.addEventListener("click", open);
+    link.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+        }
+    });
+}
+
 /**
  * Sets up the page shell for admin.html / employee.html.
  *
@@ -716,22 +931,14 @@ export function initShell(config) {
     shell = config;
     state.currentUser = user.id;
 
-    const avatar = document.getElementById("sidebar-avatar");
-    avatar.style.background = colorFor(user.id);
-    avatar.textContent = initials(user.name);
-    document.getElementById("sidebar-name").textContent = user.name;
-    const ROLE_LABELS = {
-        admin: "Admin",
-        employee: "Employee",
-        "project-manager": "Project Manager",
-    };
-    document.getElementById("sidebar-role").textContent =
-        ROLE_LABELS[user.role] || user.role;
+    refreshSidebarUser();
+    makeSidebarUserClickable();
 
     document.getElementById("logout-btn").addEventListener("click", () => {
-        clearSession();
-        window.location.href = "index.html";
+        confirmSignOut();
     });
+
+    installBackGuard();
 
     // Signing out in another tab, or using the back button after logout
     window.addEventListener("pageshow", (e) => {
@@ -758,7 +965,7 @@ export function initShell(config) {
     });
 
     initModals();
-    goView(config.defaultView);
+    goView(savedView() || config.defaultView);
     return user;
 }
 
@@ -776,10 +983,15 @@ export function goView(viewId) {
         .querySelectorAll(".nav-item")
         .forEach((b) => b.classList.toggle("active", b.dataset.view === viewId));
 
-    const [title, sub] = shell.titles[viewId];
+    document
+        .querySelector(".sidebar-user")
+        ?.classList.toggle("active", viewId === "profile");
+
+    const [title, sub] = shell.titles[viewId] || EXTRA_VIEW_TITLES[viewId] || ["", ""];
     document.getElementById("topbar-title").textContent = title;
     document.getElementById("topbar-sub").textContent = sub;
 
+    rememberView(viewId);
     renderTopbarActions(viewId);
     renderView(viewId);
     closeSidebar();
@@ -799,6 +1011,10 @@ export function renderTopbarActions(viewId) {
 }
 
 export function renderView(viewId) {
+    if (viewId === "profile") {
+        mountProfile();
+        return;
+    }
     shell.render(viewId);
     shell.updateNavCounts();
 }
@@ -809,6 +1025,7 @@ export function rerenderCurrent() {
 }
 
 import { supabase } from './supabase.js';
+import { mountProfile } from "./profile.js";
 
 export async function initializeApp() {
 

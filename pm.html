@@ -12,6 +12,9 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="worksheet.css" />
+    <link rel="stylesheet" href="profile.css" />
+    <link rel="stylesheet" href="mobile.css" />
+    <link rel="stylesheet" href="glass.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
@@ -20,7 +23,6 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script type="module" src="js/supabase.js"></script>
 </head>
-
 <body>
     <!-- ============ APP SHELL ============ -->
     <div class="sidebar-scrim" id="sidebar-scrim"></div>
@@ -113,6 +115,11 @@
                     </div>
                 </div>
                 <div class="topbar-actions" id="topbar-actions"></div>
+            </div>
+
+            <!-- ===== PROFILE (opened from the sidebar footer) ===== -->
+            <div class="view hidden" id="view-profile">
+                <div id="profile-content"></div>
             </div>
 
             <!-- ===== OVERVIEW ===== -->

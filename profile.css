@@ -1,0 +1,236 @@
+/* ============================================================
+   profile.css — "My profile" page, avatar photos, sidebar link,
+   photo cropper. Load after styles.css (and before/after glass.css).
+   ============================================================ */
+
+/* ---------- avatars can show a photo ---------- */
+.avatar {
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- sidebar footer: clickable user ---------- */
+.sidebar-user {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  margin: -6px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sidebar-user:hover,
+.sidebar-user.active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user:focus-visible {
+  outline: 2px solid #64a8ff;
+  outline-offset: 1px;
+}
+
+/* ---------- profile page ---------- */
+.profile-page {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* The two columns share one grid so the photo card and the
+   "Personal details" panel are the same height (bottoms line up).
+   .profile-main is flattened so its panels become grid items. */
+.profile-main {
+  display: contents;
+}
+
+.profile-grid {
+  align-items: stretch;
+}
+
+.profile-grid .panel {
+  margin-bottom: 0;
+}
+
+.profile-photo-card {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+}
+
+.profile-main > .panel:nth-child(1) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.profile-main > .panel:nth-child(2) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.profile-photo-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 28px 22px 24px;
+}
+
+.profile-photo-body h3 {
+  margin: 8px 0 0;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.profile-avatar {
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--ink);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 28px rgba(31, 38, 90, 0.18);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-photo-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.profile-photo-body .hint {
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.profile-form {
+  padding: 20px 22px 8px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: 14px;
+}
+
+.profile-form input.profile-readonly {
+  background: rgba(20, 30, 70, 0.05);
+  color: var(--muted);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* ---------- cropper ---------- */
+.crop-stage {
+  position: relative;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.crop-stage:active {
+  cursor: grabbing;
+}
+
+.crop-canvas {
+  display: block;
+}
+
+/* dims everything outside the circle */
+.crop-mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+
+.crop-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.crop-zoom {
+  flex: 1;
+  accent-color: var(--lime-dark);
+}
+
+.crop-hint {
+  text-align: center;
+  margin: 10px 0 0;
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 880px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-photo-card,
+  .profile-main > .panel:nth-child(1),
+  .profile-main > .panel:nth-child(2) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-form {
+    padding: 16px 16px 4px;
+  }
+
+  .profile-actions {
+    flex-direction: column-reverse;
+  }
+
+  .profile-actions .btn {
+    width: 100%;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    font-size: 40px;
+  }
+}

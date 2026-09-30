@@ -56,3 +56,47 @@ export async function emailProjectManager(
         toast(`Progress saved, but the project manager couldn't be emailed: ${e.message}`, "error");
     }
 }
+
+/**
+ * Emails the assignee(s) when an admin / project manager asks for an update.
+ *   taskIds      projects the request was just saved on (update_requested = true)
+ *   employeeIds  optional: only email these people (used by the "Ask for update"
+ *                button in the People table, where the request targets one person)
+ *   requesterId  the admin / project manager who pressed the button
+ * One email per person, listing all of their requested projects.
+ * Never throws; callers don't need to await it.
+ */
+export async function emailEmployeesUpdateRequest({ taskIds, employeeIds, requesterId }) {
+    if (!taskIds?.length) return;
+
+    const body = {
+        taskIds,
+        employeeIds: employeeIds || null,
+        requesterId,
+        // link for the email button: the employee dashboard, next to this page
+        appUrl: new URL("employee.html", window.location.href).href,
+    };
+    console.log("[notify] calling notify-employee", body);
+
+    try {
+        const { data, error } = await supabase.functions.invoke("notify-employee", { body });
+
+        if (error) throw new Error(await realErrorMessage(error));
+        if (data?.error) throw new Error(data.error);
+
+        console.log("[notify] update-request email(s) sent", data);
+
+        if (data?.sent) {
+            toast(`Reminder emailed to ${data.sent} ${data.sent === 1 ? "person" : "people"}.`, "success");
+        }
+        if (data?.skipped?.length) {
+            toast(`No email address on file for: ${data.skipped.join(", ")}.`, "info");
+        }
+        if (!data?.sent && !data?.skipped?.length) {
+            toast("Update requested, but nobody was found to email.", "info");
+        }
+    } catch (e) {
+        console.warn("[notify] employee email failed:", e);
+        toast(`Update requested, but the email couldn't be sent: ${e.message}`, "error");
+    }
+}
